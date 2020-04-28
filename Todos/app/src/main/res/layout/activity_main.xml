@@ -25,6 +25,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:src="@drawable/ic_add_btn_white_24dp"
+        android:onClick="openNewTask"
         android:layout_margin="32dp"
         android:layout_height="wrap_content"/>
 
