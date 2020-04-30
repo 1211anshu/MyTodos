@@ -15,8 +15,11 @@
         android:layout_height="wrap_content"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/todoRv"
         android:layout_below="@+id/toolbar"
+        android:id="@+id/todoRv"
+        tools:itemCount="3"
+        android:padding="8dp"
+        tools:listitem="@layout/item_todo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

@@ -30,7 +30,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     val finalDate = 0L
     val finalTime = 0L
 
-    private val labels = arrayListOf("Personal", "Buisness", "Insuranc", "shopping", "Banking")
+    private val labels = arrayListOf("Personal", "Business", "Insurance", "shopping", "Banking")
 
     val db by lazy {
         AppDatabase.getDatabase(this)
