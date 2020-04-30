@@ -5,9 +5,15 @@ import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.room.Room
 import kotlinx.android.synthetic.main.activity_task.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -21,12 +27,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     lateinit var timeSetListener: TimePickerDialog.OnTimeSetListener
 
+    val finalDate = 0L
+    val finalTime = 0L
+
+    private val labels = arrayListOf("Personal", "Buisness", "Insuranc", "shopping", "Banking")
+
     val db by lazy {
-        Room.databaseBuilder(
-            this,
-            AppDatabase::class.java,
-            DB_NAME
-        )
+        AppDatabase.getDatabase(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,17 +41,79 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_task)
 
         dateEdt.setOnClickListener(this)
+        timeEdt.setOnClickListener(this)
+        saveBtn.setOnClickListener(this)
+
+        setUpSpinner()
+    }
+
+    private fun setUpSpinner() {
+        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, labels)
+
+        labels.sort()
+        spinnerCategory.adapter = adapter
     }
 
     override fun onClick(v: View) {
         when(v.id){
             R.id.dateEdt->{
-                setLListener()
+                setListener()
+            }
+            R.id.timeEdt->{
+                setTimeListener()
+            }
+            R.id.saveBtn->{
+                saveTodo()
             }
         }
     }
 
-    private fun setLListener() {
+    private fun saveTodo() {
+        val category = spinnerCategory.selectedItem.toString()
+        val title = titleInpLay.editText?.text.toString()
+        val description = taskInpLay.editText?.text.toString()
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val id = withContext(Dispatchers.IO) {
+                return@withContext db.todoDao().insertTask(
+                    TodoModel(
+                        title,
+                        description,
+                        category,
+                        finalDate,
+                        finalTime
+                    )
+                )
+            }
+            finish()
+        }
+
+    }
+
+    private fun setTimeListener() {
+        myCalendar = Calendar.getInstance()
+
+        timeSetListener = TimePickerDialog.OnTimeSetListener(){ _: TimePicker, hourOfDay: Int, min: Int ->
+            myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            myCalendar.set(Calendar.MINUTE, min);
+            updateTime()
+        }
+
+        val timePickerDialog = TimePickerDialog(
+            this, timeSetListener, myCalendar.get(Calendar.HOUR_OF_DAY),
+            myCalendar.get(Calendar.MINUTE), false
+        )
+
+        timePickerDialog.show()
+    }
+
+    private fun updateTime() {
+        val myformat = "h:mm a"
+        val sdf = SimpleDateFormat(myformat)
+        timeEdt.setText(sdf.format(myCalendar.time))
+    }
+
+    private fun setListener() {
         myCalendar = Calendar.getInstance()
 
         dateSetListener = DatePickerDialog.OnDateSetListener{ _: DatePicker, year: Int, month: Int, dayOFMonth: Int ->
