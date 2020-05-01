@@ -10,7 +10,7 @@ data class TodoModel(
     var category:String,
     var date:Long,
     var time:Long,
-    var isFinished:Int = -1,
+    var isFinished:Int = 0,
     @PrimaryKey(autoGenerate = true)
     var id:Long = 0
 )
