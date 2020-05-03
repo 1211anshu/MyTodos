@@ -48,4 +48,8 @@ class TodoAdapter (val list: List<TodoModel>):RecyclerView.Adapter<TodoAdapter.T
         holder.bind(list[position])
     }
 
+    override fun getItemId(position: Int): Long {
+        return list[position].id
+    }
+
 }
